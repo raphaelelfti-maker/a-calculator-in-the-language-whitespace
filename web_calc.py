@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Web-Frontend fuer den Whitespace-Taschenrechner.
+"""Web frontend for the Whitespace calculator.
 
-Start:  python web_calc.py
-Dann im Browser oeffnen: http://localhost:8000
-Das Terminal bleibt sichtbar und loggt jeden Befehl mit.
+Run:  python web_calc.py
+Then open in the browser: http://localhost:8000
+The terminal stays open and logs every command.
 
-Nur Standardbibliothek, keine Abhaengigkeiten.
+Uses only the standard library, no dependencies.
 """
 import io
 import json
@@ -16,7 +16,7 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent
 CALC_WS = BASE / "calc.ws"
 
-import ws_interpreter  # lokaler Interpreter
+import ws_interpreter  # local interpreter
 
 with open(CALC_WS, "r", encoding="utf-8") as f:
     PROGRAM = ws_interpreter.parse(f.read())
@@ -59,19 +59,19 @@ document.querySelectorAll("#opbtns button").forEach(b=>b.onclick=()=>{
  b.classList.add("sel"); op=b.dataset.op; document.getElementById("opsign").textContent=names[op];});
 async function calc(){
  const a=document.getElementById("a").value||"0", b=document.getElementById("b").value||"0";
- const cmd=`printf "${a}\\\\n${b}\\\\n${op}\\\\n" | python ws_interpreter.py calc.ws`;
- document.getElementById("console").textContent="$ "+cmd+"\\n... laeuft ...";
+ const cmd=`printf "${a}\\n${b}\\n${op}\\n" | python ws_interpreter.py calc.ws`;
+ document.getElementById("console").textContent="$ "+cmd+"\n... laeuft ...";
  const r=await fetch(`/api/calc?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}&op=${op}`);
  const j=await r.json();
  document.getElementById("res").textContent="Ergebnis: "+j.result.trim()+"  ("+a+" "+names[op]+" "+b+")";
- document.getElementById("console").textContent="$ "+j.command+"\\n"+j.result+(j.stderr?"\\nERR: "+j.stderr:"");
+ document.getElementById("console").textContent="$ "+j.command+"\n"+j.result+(j.stderr?"\nERR: "+j.stderr:"");
 }
 </script></body></html>"""
 
 
 def run_calc(a: str, b: str, op: str):
     op = OP_MAP.get(op, "1")
-    # robust: nur ints, sonst 0 (wie Interpreter)
+    # robust: only ints, otherwise 0 (like the interpreter)
     def to_int(s):
         try:
             return str(int(str(s).strip()))
@@ -84,17 +84,17 @@ def run_calc(a: str, b: str, op: str):
     err = ""
     try:
         ws_interpreter.run(PROGRAM, input_text, out=buf)
-    except Exception as e:  # z.B. Division durch Null bei fremdem .ws
+    except Exception as e:  # e.g. division by zero with a foreign .ws
         err = str(e)
     result = buf.getvalue()
-    # --- im echten Terminal (Command Prompt) anzeigen ---
+    # --- display in the real terminal (Command Prompt) ---
     print(f"$ {command}\n{result.strip()}" + (f"\nERR: {err}" if err else ""), flush=True)
     return result, err, command
 
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
-        pass  # ruhiger; wir loggen selbst
+        pass  # quiet; we log ourselves
 
     def _send(self, body: bytes, ctype="text/html; charset=utf-8"):
         self.send_response(200)
