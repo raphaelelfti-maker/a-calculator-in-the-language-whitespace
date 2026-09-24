@@ -26,9 +26,9 @@ OP_MAP = {"+": "1", "-": "2", "*": "3", "/": "4", "%": "5",
 OP_NAME = {"1": "+", "2": "-", "3": "*", "4": "/", "5": "%"}
 
 PAGE = """<!DOCTYPE html>
-<html lang="de"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WC Taschenrechner (Whitespace)</title>
+<title>WC Calculator (Whitespace)</title>
 <style>
 body{font-family:Consolas,monospace;max-width:640px;margin:30px auto;padding:0 15px;background:#f4f4f4}
 .card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px #0002}
@@ -39,17 +39,17 @@ input,select,button{font-size:18px;padding:8px;margin:4px}
 #console{background:#111;color:#0f0;padding:12px;border-radius:8px;white-space:pre-wrap;min-height:90px}
 </style></head><body>
 <div class="card">
-<h2>WC Taschenrechner (Whitespace)</h2>
+<h2>WC Calculator (Whitespace)</h2>
 <input id="a" type="number" value="10" style="width:110px"> 
 <span id="opsign">+</span>
 <input id="b" type="number" value="3" style="width:110px">
 <div id="opbtns">
 <button data-op="1" class="sel">+</button><button data-op="2">-</button><button data-op="3">*</button><button data-op="4">/</button><button data-op="5">%</button>
 </div>
-<button onclick="calc()">= Rechnen (via calc.ws)</button>
-<div id="res">Ergebnis: ...</div>
+<button onclick="calc()">= Calculate (via calc.ws)</button>
+<div id="res">Result: ...</div>
 <h3>Command Prompt (live):</h3>
-<div id="console">$ bereit...</div>
+<div id="console">$ ready...</div>
 </div>
 <script>
 let op="1";
@@ -60,10 +60,10 @@ document.querySelectorAll("#opbtns button").forEach(b=>b.onclick=()=>{
 async function calc(){
  const a=document.getElementById("a").value||"0", b=document.getElementById("b").value||"0";
  const cmd=`printf "${a}\\n${b}\\n${op}\\n" | python ws_interpreter.py calc.ws`;
- document.getElementById("console").textContent="$ "+cmd+"\n... laeuft ...";
+ document.getElementById("console").textContent="$ "+cmd+"\n... running ...";
  const r=await fetch(`/api/calc?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}&op=${op}`);
  const j=await r.json();
- document.getElementById("res").textContent="Ergebnis: "+j.result.trim()+"  ("+a+" "+names[op]+" "+b+")";
+ document.getElementById("res").textContent="Result: "+j.result.trim()+"  ("+a+" "+names[op]+" "+b+")";
  document.getElementById("console").textContent="$ "+j.command+"\n"+j.result+(j.stderr?"\nERR: "+j.stderr:"");
 }
 </script></body></html>"""
@@ -122,6 +122,6 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     srv = HTTPServer(("127.0.0.1", 8000), Handler)
-    print("WC Taschenrechner Web-UI laeuft auf http://localhost:8000")
-    print("Terminal bleibt offen und zeigt jeden Befehl. Strg+C zum Stoppen.", flush=True)
+    print("WC Calculator Web UI is running at http://localhost:8000")
+    print("The terminal stays open and shows every command. Ctrl+C to stop.", flush=True)
     srv.serve_forever()
